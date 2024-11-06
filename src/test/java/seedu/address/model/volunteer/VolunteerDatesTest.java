@@ -7,6 +7,7 @@ import seedu.address.model.exceptions.VolunteerDeleteMissingDateException;
 import seedu.address.model.exceptions.VolunteerDuplicateDateException;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -84,13 +85,6 @@ public class VolunteerDatesTest {
     }
 
     @Test
-    public void removeAllDatesFromVolunteerDates() {
-        volunteerDates.removeStringOfDatesFromAvailList(defaultDate.toString());
-        StringProperty dateList = volunteerDates.getDatesListAsObservableString();
-        assertEquals(dateList.toString(), generateStringProperty());
-    }
-
-    @Test
     public void RemoveDateFromVolunteerDates_invalidDateOrDateNotPresent_checkForNoChange() {
         String notPresentDate = "2022-01-17";
         assertThrows(VolunteerDeleteMissingDateException.class, () -> volunteerDates.removeStringOfDatesFromAvailList(notPresentDate));
@@ -103,4 +97,58 @@ public class VolunteerDatesTest {
         StringProperty dateList = volunteerDates.getDatesListAsObservableString();
         assertEquals(dateList.toString(),generateStringProperty(defaultDate.toString()));
     }
+
+    @Test
+    public void RemoveAllDatesFromVolunteerDates() {
+        volunteerDates.removeStringOfDatesFromAvailList(defaultDate.toString());
+        StringProperty dateList = volunteerDates.getDatesListAsObservableString();
+        assertEquals(dateList.toString(), generateStringProperty());
+    }
+
+    @Test
+    public void isValidListOfDates_validDates_returnTrue() {
+        String[] dateList = new String[] {
+                "2022-01-15",
+                "2022-01-16",
+                "2022-01-15,2022-01-16"
+        };
+        Arrays.stream(dateList).forEach(dates -> assertTrue(VolunteerDates.isValidListOfDates(dates)));
+    }
+
+    @Test
+    public void isValidListOfDates_invalidDates_returnFalse() {
+        String[] datelist = new String[] {
+                "2022-02-55",
+                "2022-20-15",
+                "20-02-15",
+                "2022-2-5",
+                "2022-020-15",
+                "2022-02-015",
+                "-02-15",
+                "2022/02/15"
+        };
+        Arrays.stream(datelist).forEach(dates -> assertFalse(VolunteerDates.isValidListOfDates(dates)));
+    }
+
+    @Test
+    public void isValidDates_validAndInvalidDates_returnFalse() {
+        String[] dateList = new String[] {
+                "2022-01-15, 2022-02-55",
+                "2022-02-55, 2022-01-15"
+        };
+        Arrays.stream(dateList).forEach(dates -> assertFalse(VolunteerDates.isValidListOfDates(dates)));
+    }
+
+    @Test
+    public void isValidDates_validDates_InputFormattingTest() {
+        String[] dateList = new String[] {
+                "2022-01-15, 2022-01-16",
+                "2022-01-15,2022-01-16",
+                "2022-01-15, 2022-01-16,",
+                "2022-01-15 2022-01-16"
+        };
+        Arrays.stream(dateList).forEach(dates -> System.out.println(dates + ": "+ VolunteerDates.isValidListOfDates(dates)));
+    }
+
+
 }
